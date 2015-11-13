@@ -114,16 +114,20 @@ public class HomeActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        Intent i;
         //noinspection SimplifiableIfStatement
         switch(id) {
             case R.id.action_settings:
                 return true;
             case R.id.action_logout:
                 logoutUser();
-                Intent i = new Intent(HomeActivity.this, LoginActivity.class);
+                i = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(i);
                 finish();
+                return true;
+            case R.id.action_house_info:
+                i = new Intent(HomeActivity.this, HouseInfoActivity.class);
+                startActivity(i);
                 return true;
         }
 
@@ -174,7 +178,6 @@ public class HomeActivity extends AppCompatActivity {
             mDB.open();
             mDB.deleteUsers();
             mDB.deleteHouse();
-            mDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

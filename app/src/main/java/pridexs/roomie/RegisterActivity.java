@@ -86,7 +86,6 @@ public class RegisterActivity extends Activity {
                         mDB.addUser(name, email, created_at, api_key);
                         Toast.makeText(getApplicationContext(), "User successfully registered.", Toast.LENGTH_LONG).show();
 
-                        mDB.close();
                         finish();
                     } else {
 

@@ -60,7 +60,6 @@ public class JoinHouseActivity extends Activity {
         try {
             mDB.open();
             user = mDB.getUserDetails();
-            mDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -100,7 +99,6 @@ public class JoinHouseActivity extends Activity {
                             }
                         }
 
-                        mDB.close();
 
                         Intent intent = new Intent(JoinHouseActivity.this, HomeActivity.class);
                         startActivity(intent);

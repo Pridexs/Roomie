@@ -65,7 +65,6 @@ public class RegisterHouseActivity extends Activity {
         try {
             mDB.open();
             user = mDB.getUserDetails();
-            mDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,7 +94,6 @@ public class RegisterHouseActivity extends Activity {
                         mDB.addHouse(house_id, house_name);
                         mDB.addHouseMember(house_id, email, 1);
 
-                        mDB.close();
 
                         Intent intent = new Intent(RegisterHouseActivity.this, HomeActivity.class);
                         startActivity(intent);

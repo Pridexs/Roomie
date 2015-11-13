@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class DBManager {
     private static DBManager mInstance;
@@ -68,7 +69,7 @@ public class DBManager {
                 "CREATE TABLE " + TABLE_USER + "(" +
                         KEY_NAME + " TEXT NOT NULL," +
                         KEY_EMAIL + " TEXT PRIMARY KEY," +
-                        KEY_CREATED_AT + " TEXT NOT NULL," +
+                        KEY_CREATED_AT + " TEXT," +
                         KEY_API_KEY + " TEXT" + ")";
 
         private static final String SQL_CREATE_HOUSE =
@@ -121,13 +122,13 @@ public class DBManager {
 
     public DBManager open() throws SQLException
     {
-        counterDB++;
-        if (counterDB == 1) {
+        if (db == null) {
             db = DBHelper.getWritableDatabase();
         }
         return this;
     }
 
+    /*
     public void close()
     {
         counterDB--;
@@ -135,6 +136,7 @@ public class DBManager {
             DBHelper.close();
         }
     }
+    */
 
     /*
      * BEGIN - LOGIN / REGISTER
@@ -149,9 +151,17 @@ public class DBManager {
         return db.insert(TABLE_USER, null, values);
     }
 
+    public long addUser(String name, String email) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name); // Name
+        values.put(KEY_EMAIL, email); // Email
+
+        return db.insert(TABLE_USER, null, values);
+    }
+
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<>();
-        String selectQuery = "SELECT  * FROM " + TABLE_USER;
+        String selectQuery = "SELECT  * FROM " + TABLE_USER + " WHERE " + KEY_API_KEY + " IS NOT null";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -163,8 +173,6 @@ public class DBManager {
             user.put("api_key", cursor.getString(3));
         }
         cursor.close();
-        // return user
-        Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
     }
@@ -178,7 +186,7 @@ public class DBManager {
      */
 
     public void deleteHouse() {
-        // DELETE ALL HOUSE INFO SYNCE IT NEEDS SYNC
+        // DELETE ALL HOUSE INFO SINCE IT NEEDS SYNC
         db.delete(TABLE_HOUSE_MEMBER, null, null);
         db.delete(TABLE_HOUSE, null, null);
     }
@@ -213,14 +221,29 @@ public class DBManager {
             house.put("last_updated", cursor.getString(2));
         }
         cursor.close();
-        // return user
-        Log.d(TAG, "Fetching house from Sqlite: " + house.toString());
 
         return house;
     }
 
-    public void synchronyze() {
+    public Vector<HashMap<String, String>> getHouseMembers() {
+        Vector< HashMap< String, String>> houseMembers = new Vector<>();
+        String selectQuery = "SELECT u." + KEY_EMAIL + ", u." + KEY_NAME + ", hm." + KEY_IS_ADMIN +
+                " FROM " + TABLE_HOUSE_MEMBER + " as hm INNER JOIN " +
+                TABLE_USER + " as u ON hm." + KEY_EMAIL + " = " +  " u." + KEY_EMAIL;
 
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        cursor.moveToFirst();
+        do {
+            HashMap<String, String> house = new HashMap<>();
+            house.put("email", cursor.getString(0));
+            house.put("name", cursor.getString(1));
+            house.put("isAdmin", cursor.getString(2));
+            houseMembers.add(house);
+        } while(cursor.moveToNext());
+        cursor.close();
+
+        return houseMembers;
     }
 
 }

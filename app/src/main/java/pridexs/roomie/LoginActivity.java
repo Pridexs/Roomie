@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginActivity extends Activity {
 
@@ -210,7 +211,6 @@ public class LoginActivity extends Activity {
                         // Inserting row in users table
                         mDB.open();
                         mDB.addUser(name, email, created_at, api_key);
-                        mDB.close();
                         verifyHouse();
 
                     } else {
@@ -267,7 +267,6 @@ public class LoginActivity extends Activity {
             mDB.open();
             user = mDB.getUserDetails();
             house = mDB.getHouseDetails();
-            mDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -306,30 +305,33 @@ public class LoginActivity extends Activity {
                             String house_name       = jObj.getString("house_name");
                             boolean requires_sync   = jObj.getBoolean("requires_sync");
 
-                            if (requires_sync) {
-                                mDB.deleteHouse();
+                            mDB.deleteHouse();
 
-                                mDB.addHouse(house_id, house_name);
+                            mDB.addHouse(house_id, house_name);
 
-                                JSONObject jMembers = jObj.getJSONObject("members");
-                                Iterator<?> keys = jMembers.keys();
-                                while (keys.hasNext()) {
-                                    String key = (String)keys.next();
-                                    if ( jMembers.get(key) instanceof JSONObject ) {
-                                        JSONObject jMem = jMembers.getJSONObject(key);
-                                        String memberEmail  = jMem.getString("email");
-                                        int isAdmin         = jMem.getInt("isAdmin");
-                                        mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                                        mDB.close();
+                            JSONObject jMembers = jObj.getJSONObject("members");
+                            Iterator<?> keys = jMembers.keys();
+                            while (keys.hasNext()) {
+                                String key = (String)keys.next();
+                                if ( jMembers.get(key) instanceof JSONObject ) {
+                                    JSONObject jMem = jMembers.getJSONObject(key);
+                                    String memberEmail  = jMem.getString("email");
+                                    String memberName   = jMem.getString("name");
+                                    int isAdmin         = jMem.getInt("isAdmin");
+                                    mDB.addHouseMember(house_id, memberEmail, isAdmin);
+                                    if (!memberEmail.equals(email)) {
+                                        mDB.addUser(memberName, memberEmail);
                                     }
                                 }
-
                             }
+                            Intent i = new Intent(LoginActivity.this, HomeActivity.class);
+                            startActivity(i);
+                            finish();
+
                         } else {
                             mDB.deleteHouse();
                             Intent intent = new Intent(LoginActivity.this, NoHouseActivity.class);
                             startActivity(intent);
-                            mDB.close();
                             finish();
                         }
                     } else {
@@ -385,7 +387,6 @@ public class LoginActivity extends Activity {
             mDB.open();
             mDB.deleteUsers();
             mDB.deleteHouse();
-            mDB.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -50,6 +50,11 @@
             android:label="@string/title_activity_join_house"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".HouseInfoActivity"
+            android:label="@string/title_activity_house_info"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>
