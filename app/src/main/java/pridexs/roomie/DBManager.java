@@ -24,6 +24,8 @@ public class DBManager {
     // Counts how many Threads have opened the DB so we don't close the instance accidentaly.
     private int counterDB = 0;
 
+    private static final String KEY_ID = "_id";
+
     // USER TABLE
     private static final String TABLE_USER = "user";
     private static final String KEY_NAME = "name";
@@ -67,20 +69,26 @@ public class DBManager {
         // STRINGS TO CREATE THE TABLES
         private static final String SQL_CREATE_USER =
                 "CREATE TABLE " + TABLE_USER + "(" +
+                        KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_NAME + " TEXT NOT NULL," +
-                        KEY_EMAIL + " TEXT PRIMARY KEY," +
+                        KEY_EMAIL + " TEXT NOT NULL," +
                         KEY_CREATED_AT + " TEXT," +
-                        KEY_API_KEY + " TEXT" + ")";
+                        KEY_API_KEY + " TEXT," +
+                        "UNIQUE(" + KEY_EMAIL + "," + KEY_ID + ")" +
+                        ")";
 
         private static final String SQL_CREATE_HOUSE =
                 "CREATE TABLE " + TABLE_HOUSE + "(" +
-                        KEY_HOUSEID + " INTEGER NOT NULL PRIMARY KEY," +
+                        KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        KEY_HOUSEID + " INTEGER NOT NULL," +
                         KEY_NAME + " TEXT NOT NULL," +
-                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE" +
+                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
+                        "UNIQUE(" + KEY_HOUSEID + "," + KEY_ID + ")" +
                         ")";
 
         private static final String SQL_CREATE_HOUSE_MEMBER =
                 "CREATE TABLE " + TABLE_HOUSE_MEMBER + "(" +
+                        KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_EMAIL + " TEXT NOT NULL," +
                         KEY_HOUSEID + " INTEGER NOT NULL," +
                         KEY_IS_ADMIN + " INTEGER NOT NULL DEFAULT 0," +
@@ -88,7 +96,7 @@ public class DBManager {
                         KEY_EMAIL + ")," +
                         "FOREIGN KEY (" + KEY_HOUSEID + ") REFERENCES " + TABLE_HOUSE + "(" +
                         KEY_HOUSEID + ")," +
-                        "PRIMARY KEY (" + KEY_EMAIL + "," + KEY_HOUSEID + ")" +
+                        "UNIQUE (" + KEY_EMAIL + "," + KEY_HOUSEID + ")" +
                         ")";
 
         public MyDatabaseHelper(Context context)
@@ -167,10 +175,10 @@ public class DBManager {
 
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            user.put("name", cursor.getString(0));
-            user.put("email", cursor.getString(1));
-            user.put("created_at", cursor.getString(2));
-            user.put("api_key", cursor.getString(3));
+            user.put("name", cursor.getString(cursor.getColumnIndexOrThrow("name")));
+            user.put("email", cursor.getString(cursor.getColumnIndexOrThrow("email")));
+            user.put("created_at", cursor.getString(cursor.getColumnIndexOrThrow("created_at")));
+            user.put("api_key", cursor.getString(cursor.getColumnIndexOrThrow("api_key")));
         }
         cursor.close();
 
@@ -216,13 +224,20 @@ public class DBManager {
 
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            house.put("houseID", cursor.getString(0));
-            house.put("name", cursor.getString(1));
-            house.put("last_updated", cursor.getString(2));
+            house.put("houseID", cursor.getString(cursor.getColumnIndexOrThrow("houseID")));
+            house.put("name", cursor.getString(cursor.getColumnIndexOrThrow("name")));
+            house.put("last_updated", cursor.getString(cursor.getColumnIndexOrThrow("last_updated")));
         }
         cursor.close();
 
         return house;
+    }
+
+    public Cursor getCursorHouseMembers() {
+        String selectQuery = "SELECT hm." + KEY_ID + ", u." + KEY_EMAIL + ", u." + KEY_NAME + ", hm." + KEY_IS_ADMIN +
+                " FROM " + TABLE_HOUSE_MEMBER + " as hm INNER JOIN " +
+                TABLE_USER + " as u ON hm." + KEY_EMAIL + " = " +  " u." + KEY_EMAIL;
+        return db.rawQuery(selectQuery, null);
     }
 
     public Vector<HashMap<String, String>> getHouseMembers() {
@@ -236,9 +251,9 @@ public class DBManager {
         cursor.moveToFirst();
         do {
             HashMap<String, String> house = new HashMap<>();
-            house.put("email", cursor.getString(0));
-            house.put("name", cursor.getString(1));
-            house.put("isAdmin", cursor.getString(2));
+            house.put("email", cursor.getString(cursor.getColumnIndexOrThrow("email")));
+            house.put("name", cursor.getString(cursor.getColumnIndexOrThrow(("name"))));
+            house.put("isAdmin", cursor.getString(cursor.getColumnIndexOrThrow("isAdmin")));
             houseMembers.add(house);
         } while(cursor.moveToNext());
         cursor.close();

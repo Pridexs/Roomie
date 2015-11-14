@@ -56,11 +56,20 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/house_info_members"
+        android:id="@+id/textViewMembers"
+        android:layout_below="@+id/house_info_password_button"
+        android:layout_alignParentStart="true" />
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"
-        android:layout_below="@+id/house_info_password_button"
+        android:id="@+id/members_list_view"
+        android:layout_below="@+id/textViewMembers"
         android:layout_alignParentStart="true" />
 
 </RelativeLayout>

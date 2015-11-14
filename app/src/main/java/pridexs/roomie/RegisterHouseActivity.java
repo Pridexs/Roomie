@@ -36,13 +36,16 @@ public class RegisterHouseActivity extends Activity {
         registerHouseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText nameView = (EditText) findViewById(R.id.text_house_name);
-                EditText passwordView = (EditText) findViewById(R.id.text_house_password);
+                if(AppController.getInstance().isNetworkAvailable()) {
+                    EditText nameView = (EditText) findViewById(R.id.text_house_name);
+                    EditText passwordView = (EditText) findViewById(R.id.text_house_password);
+                    String houseName = nameView.getText().toString().trim();
+                    String housePass = passwordView.getText().toString().trim();
 
-                String houseName = nameView.getText().toString().trim();
-                String housePass = passwordView.getText().toString().trim();
-
-                registerHouse(houseName, housePass);
+                    registerHouse(houseName, housePass);
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

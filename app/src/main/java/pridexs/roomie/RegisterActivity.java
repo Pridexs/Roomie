@@ -42,7 +42,12 @@ public class RegisterActivity extends Activity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                register();
+                if (AppController.getInstance().isNetworkAvailable()) {
+                    register();
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 

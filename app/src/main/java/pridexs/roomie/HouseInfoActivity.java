@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.sql.SQLException;
@@ -48,7 +49,9 @@ public class HouseInfoActivity extends AppCompatActivity {
             mHouseId.setText(houseId);
 
             Vector<HashMap<String, String>> houseMembers = mDB.getHouseMembers();
-            // Load List
+            ListView membersList = (ListView) findViewById(R.id.members_list_view);
+            HouseInfoAdapter adapter = new HouseInfoAdapter(this, mDB.getCursorHouseMembers(), 0);
+            membersList.setAdapter(adapter);
 
         } catch (SQLException e) {
             e.printStackTrace();

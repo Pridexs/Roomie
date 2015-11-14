@@ -37,13 +37,15 @@ public class JoinHouseActivity extends Activity {
         joinHouseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText idView = (EditText) findViewById(R.id.text_id_join);
-                EditText passwordView = (EditText) findViewById(R.id.text_password_join);
-
-                int houseId = Integer.parseInt(idView.getText().toString());
-                String housePass = passwordView.getText().toString().trim();
-
-                joinHouse(houseId, housePass);
+                if (AppController.getInstance().isNetworkAvailable()) {
+                    EditText idView = (EditText) findViewById(R.id.text_id_join);
+                    EditText passwordView = (EditText) findViewById(R.id.text_password_join);
+                    int houseId = Integer.parseInt(idView.getText().toString());
+                    String housePass = passwordView.getText().toString().trim();
+                    joinHouse(houseId, housePass);
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -99,7 +101,8 @@ public class JoinHouseActivity extends Activity {
                             }
                         }
 
-
+                        Toast.makeText(getApplicationContext(), "You've successfully joined " +
+                                house_name, Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(JoinHouseActivity.this, HomeActivity.class);
                         startActivity(intent);
                         finish();
@@ -122,7 +125,6 @@ public class JoinHouseActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("JOINHOUSEACTIVITY", "Login Error: " + error.getMessage());
                 Toast.makeText(getApplicationContext(),
                         error.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -142,7 +144,6 @@ public class JoinHouseActivity extends Activity {
 
         };
 
-        // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 }

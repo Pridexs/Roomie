@@ -68,8 +68,12 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+                    if (AppController.getInstance().isNetworkAvailable()) {
+                        attemptLogin();
+                        return true;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                    }
                 }
                 return false;
             }
@@ -293,7 +297,6 @@ public class LoginActivity extends Activity {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
 
-                    // Check for error node in json
                     if (!error) {
 
                         boolean valid_house = jObj.getBoolean("valid_house");
@@ -303,10 +306,8 @@ public class LoginActivity extends Activity {
                         if (valid_house) {
                             int house_id            = jObj.getInt("house_id");
                             String house_name       = jObj.getString("house_name");
-                            boolean requires_sync   = jObj.getBoolean("requires_sync");
 
                             mDB.deleteHouse();
-
                             mDB.addHouse(house_id, house_name);
 
                             JSONObject jMembers = jObj.getJSONObject("members");
