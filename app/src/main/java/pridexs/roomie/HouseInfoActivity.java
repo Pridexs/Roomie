@@ -48,7 +48,6 @@ public class HouseInfoActivity extends AppCompatActivity {
             mHouseName.setText(houseName);
             mHouseId.setText(houseId);
 
-            Vector<HashMap<String, String>> houseMembers = mDB.getHouseMembers();
             ListView membersList = (ListView) findViewById(R.id.members_list_view);
             HouseInfoAdapter adapter = new HouseInfoAdapter(this, mDB.getCursorHouseMembers(), 0);
             membersList.setAdapter(adapter);

@@ -218,7 +218,7 @@ public class LoginActivity extends Activity {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
                         Toast.makeText(getApplicationContext(),
-                                errorMsg, Toast.LENGTH_LONG).show();
+                                "Error: " + errorMsg, Toast.LENGTH_LONG).show();
                         showProgress(false);
                     }
                 } catch (JSONException e) {
@@ -274,13 +274,7 @@ public class LoginActivity extends Activity {
 
         final String email = user.get("email");
         final String api_key = user.get("api_key");
-        final String last_updated;
-
-        if (house.isEmpty()) {
-            last_updated = "0000-00-00 00:00:00";
-        } else {
-            last_updated = house.get("last_updated");
-        }
+        final String last_updated = "0000-00-00 00:00:00";
 
         // Tag used to cancel the request
         String tag_string_req = "req_home_activity";
@@ -304,9 +298,6 @@ public class LoginActivity extends Activity {
                         if (valid_house) {
                             int house_id            = jObj.getInt("house_id");
                             String house_name       = jObj.getString("house_name");
-                            boolean requires_sync   = jObj.getBoolean("requires_sync");
-
-                            mDB.deleteHouse();
 
                             mDB.addHouse(house_id, house_name);
 
@@ -321,6 +312,22 @@ public class LoginActivity extends Activity {
                                     mDB.addUser(memberName, memberEmail);
                                 }
                             }
+
+                            if (jObj.has("notes")) {
+                                JSONArray jNotes = jObj.getJSONArray("notes");
+                                for (int i = 0; i < jNotes.length(); i++) {
+                                    JSONObject jNote    = jNotes.getJSONObject(i);
+                                    String name         = jNote.getString("name");
+                                    String description  = jNote.getString("description");
+                                    int noteId          = jNote.getInt("noteID");
+                                    String createdBy    = jNote.getString("createdBy");
+                                    String created_at   = jNote.getString("created_at");
+                                    String last_updated = jNote.getString("last_updated");
+                                    mDB.addNote(noteId, name, description, createdBy, created_at
+                                            , last_updated, house_id);
+                                }
+                            }
+
                             Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(i);
                             finish();

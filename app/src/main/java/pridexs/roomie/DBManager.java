@@ -78,6 +78,7 @@ public class DBManager {
                         KEY_NAME + " TEXT NOT NULL," +
                         KEY_EMAIL + " TEXT NOT NULL," +
                         KEY_CREATED_AT + " TEXT," +
+                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
                         KEY_API_KEY + " TEXT," +
                         "UNIQUE(" + KEY_EMAIL + "," + KEY_ID + ")" +
                         ")";
@@ -87,7 +88,7 @@ public class DBManager {
                         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_HOUSEID + " INTEGER NOT NULL," +
                         KEY_NAME + " TEXT NOT NULL," +
-                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
+                        KEY_LAST_UPDATED + " TEXT," +
                         "UNIQUE(" + KEY_HOUSEID + "," + KEY_ID + ")" +
                         ")";
 
@@ -117,7 +118,7 @@ public class DBManager {
                         KEY_HOUSEID + ")," +
                         "FOREIGN KEY (" + KEY_CREATED_BY + ") REFERENCES " + TABLE_USER + "(" +
                         KEY_EMAIL + ")," +
-                        "UNIQUE (" + KEY_HOUSEID + ")" +
+                        "UNIQUE (" + KEY_ID + ")" +
                         ")";
 
         public MyDatabaseHelper(Context context)
@@ -190,6 +191,7 @@ public class DBManager {
         return db.insert(TABLE_USER, null, values);
     }
 
+    // Gets the app user, he is the only one that has API_KEY set.
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<>();
         String selectQuery = "SELECT  * FROM " + TABLE_USER + " WHERE " + KEY_API_KEY + " IS NOT null";
@@ -201,6 +203,7 @@ public class DBManager {
             user.put("name", cursor.getString(cursor.getColumnIndexOrThrow("name")));
             user.put("email", cursor.getString(cursor.getColumnIndexOrThrow("email")));
             user.put("created_at", cursor.getString(cursor.getColumnIndexOrThrow("created_at")));
+            user.put("last_updated", cursor.getString(cursor.getColumnIndexOrThrow("last_updated")));
             user.put("api_key", cursor.getString(cursor.getColumnIndexOrThrow("api_key")));
         }
         cursor.close();
@@ -229,6 +232,14 @@ public class DBManager {
         values.put(KEY_NAME, name); // Name
 
         return db.insert(TABLE_HOUSE, null, values);
+    }
+
+    public long updateHouse(int houseID, String name, String last_updated) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_LAST_UPDATED, last_updated);
+
+        return db.update(TABLE_HOUSE, values, KEY_HOUSEID + "=?", new String[]{Integer.toString(houseID)});
     }
 
     public long addHouseMember(int houseID, String email, int isAdmin) {
@@ -284,6 +295,27 @@ public class DBManager {
         cursor.close();
 
         return houseMembers;
+    }
+
+    public long addNote(int noteId, String name, String description, String createdBy,
+                        String created_at, String last_updated, int houseId) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, noteId);
+        values.put(KEY_NAME, name);
+        values.put(KEY_DESCRIPTION, description);
+        values.put(KEY_CREATED_BY, createdBy);
+        values.put(KEY_CREATED_AT, created_at);
+        values.put(KEY_LAST_UPDATED, last_updated);
+        values.put(KEY_HOUSEID, houseId);
+
+        return db.insert(TABLE_NOTE, null, values);
+    }
+    public Cursor getCursorNotes() {
+        String selectQuery = "SELECT u." + KEY_NAME + " as memberName, n.*" +
+                " FROM " + TABLE_NOTE + " as n INNER JOIN " +
+                TABLE_USER + " as u ON n." + KEY_CREATED_BY + " = " +  " u." + KEY_EMAIL +
+                " ORDER BY " + KEY_LAST_UPDATED + " DESC";
+        return db.rawQuery(selectQuery, null);
     }
 
 }

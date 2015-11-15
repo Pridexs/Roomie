@@ -21,7 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
-                android:id="@+id/refreshHouse"
+                android:id="@+id/refresh_house"
                 android:background="@null"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_autorenew_24dp"

@@ -1,21 +1,24 @@
 package pridexs.roomie;
 
-import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.app.ListFragment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.sql.SQLException;
 
-public class NotesFragment extends Fragment {
+
+public class NotesFragment extends android.support.v4.app.Fragment {
+
+    TextView        mWarning;
+    ListView        mNotes;
+    NotesAdapter    mAdapter;
+    DBManager       mDB;
 
 
     private OnFragmentInteractionListener mListener;
@@ -25,16 +28,14 @@ public class NotesFragment extends Fragment {
         return fragment;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public NotesFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDB = DBManager.getInstance(getActivity());
 
     }
 
@@ -43,7 +44,25 @@ public class NotesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_notes, container, false);
 
+        mNotes = (ListView) rootView.findViewById(R.id.notes_list_view);
+        mWarning = (TextView) rootView.findViewById(R.id.notes_warning);
 
+        try {
+            mDB.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        Cursor notesCursor = mDB.getCursorNotes();
+        if (notesCursor.moveToFirst())
+        {
+            mAdapter = new NotesAdapter(getActivity(), notesCursor, 0);
+            mNotes.setAdapter(mAdapter);
+        } else {
+            mNotes.setVisibility(View.GONE);
+            mWarning.setVisibility(View.VISIBLE);
+        }
 
         return rootView;
     }
@@ -51,13 +70,22 @@ public class NotesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateCursor() {
+        try {
+            mDB.open();
+            mAdapter.changeCursor(mDB.getCursorNotes());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

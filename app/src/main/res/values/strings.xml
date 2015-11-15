@@ -56,4 +56,7 @@
     <string name="house_info_members">Members</string>
     <string name="house_info">House</string>
 
+    <!-- Notes -->
+    <string name="no_notes">No Notes :(</string>
+
 </resources>
