@@ -88,7 +88,7 @@ public class DBManager {
                         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_HOUSEID + " INTEGER NOT NULL," +
                         KEY_NAME + " TEXT NOT NULL," +
-                        KEY_LAST_UPDATED + " TEXT," +
+                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
                         "UNIQUE(" + KEY_HOUSEID + "," + KEY_ID + ")" +
                         ")";
 
@@ -215,6 +215,14 @@ public class DBManager {
         // Delete All Rows
         db.delete(TABLE_USER, null, null);
     }
+
+    public long updateUser(String email, String name, int isAdmin) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, email);
+        values.put(KEY_IS_ADMIN, isAdmin);
+
+        return db.update(TABLE_HOUSE_MEMBER, values, KEY_EMAIL + "=?", new String[]{email});
+    }
     /*
      * END - LOGIN / REGISTER
      */
@@ -226,10 +234,11 @@ public class DBManager {
         db.delete(TABLE_HOUSE, null, null);
     }
 
-    public long addHouse(int houseID, String name) {
+    public long addHouse(int houseID, String name, String last_updated) {
         ContentValues values = new ContentValues();
         values.put(KEY_HOUSEID, houseID); // houseID
         values.put(KEY_NAME, name); // Name
+        values.put(KEY_LAST_UPDATED, last_updated);
 
         return db.insert(TABLE_HOUSE, null, values);
     }
@@ -240,6 +249,16 @@ public class DBManager {
         values.put(KEY_LAST_UPDATED, last_updated);
 
         return db.update(TABLE_HOUSE, values, KEY_HOUSEID + "=?", new String[]{Integer.toString(houseID)});
+    }
+
+    public long updateNote(int noteId, String name, String description,
+                           String last_updated) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, name);
+        values.put(KEY_DESCRIPTION, description);
+        values.put(KEY_LAST_UPDATED, last_updated);
+
+        return db.update(TABLE_NOTE, values, KEY_ID + "=?", new String[]{Integer.toString(noteId)});
     }
 
     public long addHouseMember(int houseID, String email, int isAdmin) {
@@ -295,6 +314,19 @@ public class DBManager {
         cursor.close();
 
         return houseMembers;
+    }
+
+    public boolean isUserOnDb(String email) {
+        String[] values = new String[] { email };
+        Cursor c = db.query(TABLE_USER, null, KEY_EMAIL + "= ?", values, null, null, null);
+        return c.moveToFirst();
+    }
+
+    public boolean isNoteOnDb(int noteId) {
+        String[] values = new String[]{Integer.toString(noteId)};
+        Cursor c = db.query(TABLE_NOTE, null, KEY_ID + "=?", values, null, null, null);
+
+        return c.moveToFirst();
     }
 
     public long addNote(int noteId, String name, String description, String createdBy,

@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,6 +113,8 @@ public class HomeActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        updateHouse();
     }
 
 
@@ -123,9 +126,7 @@ public class HomeActivity extends AppCompatActivity {
         mRefreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateNotes();
-                NotesFragment notesFragment = (NotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_notes);
-                notesFragment.updateCursor();
+                updateHouse();
             }
         });
         return true;
@@ -168,7 +169,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void updateNotes() {
+    private void updateHouse() {
         HashMap<String, String> user = new HashMap<>();
         HashMap<String, String> house = new HashMap<>();
         try {
@@ -181,14 +182,8 @@ public class HomeActivity extends AppCompatActivity {
 
         final String email = user.get("email");
         final String api_key = user.get("api_key");
-        final String houseID = house.get("houseID");
-        final String last_updated;
+        final String last_updated = user.get("last_updated");
 
-        if (house.isEmpty()) {
-            last_updated = "0000-00-00 00:00:00";
-        } else {
-            last_updated = user.get("last_updated");
-        }
 
         // Tag used to cancel the request
         String tag_string_req = "req_home_activity";
@@ -212,23 +207,50 @@ public class HomeActivity extends AppCompatActivity {
                         if (valid_house) {
                             int house_id            = jObj.getInt("house_id");
                             String house_name       = jObj.getString("house_name");
-
+                            String h_last_updated   = jObj.getString("last_updated");
                             boolean requires_sync   = jObj.getBoolean("requires_sync");
-                            String houseLastUpdated = jObj.getString("last_updated");
 
-                            mDB.updateHouse(house_id, house_name, houseLastUpdated);
-                            JSONArray jMembers = jObj.getJSONArray("members");
-                            for (int i = 0; i < jMembers.length(); i++) {
-                                JSONObject jMem     = jMembers.getJSONObject(i);
-                                String memberEmail  = jMem.getString("email");
-                                String memberName   = jMem.getString("name");
-                                int isAdmin         = jMem.getInt("isAdmin");
-                                mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                                if (!memberEmail.equals(email)) {
-                                    mDB.addUser(memberName, memberEmail);
+                            if (requires_sync) {
+
+                                mDB.updateHouse(house_id, house_name, h_last_updated);
+                                JSONArray jMembers = jObj.getJSONArray("members");
+                                for (int i = 0; i < jMembers.length(); i++) {
+                                    JSONObject jMem     = jMembers.getJSONObject(i);
+                                    String memberEmail  = jMem.getString("email");
+                                    String memberName   = jMem.getString("name");
+                                    int isAdmin         = jMem.getInt("isAdmin");
+                                    if (mDB.isUserOnDb(memberEmail))
+                                    {
+                                        mDB.updateUser(memberEmail, memberName, isAdmin);
+                                    } else {
+                                        mDB.addHouseMember(house_id, memberEmail, isAdmin);
+                                        if (!memberEmail.equals(email)) {
+                                            mDB.addUser(memberName, memberEmail);
+                                        }
+                                    }
                                 }
                             }
-                            // what to do
+
+                            if (jObj.has("notes")) {
+                                JSONArray jNotes = jObj.getJSONArray("notes");
+                                for (int i = 0; i < jNotes.length(); i++) {
+                                    JSONObject jNote    = jNotes.getJSONObject(i);
+                                    int noteId          = jNote.getInt("noteID");
+                                    String name         = jNote.getString("name");
+                                    String description  = jNote.getString("description");
+                                    String createdBy    = jNote.getString("createdBy");
+                                    String created_at   = jNote.getString("created_at");
+                                    String last_updated = jNote.getString("last_updated");
+                                    if (mDB.isNoteOnDb(noteId)) {
+                                        mDB.updateNote(noteId, name, description, last_updated);
+                                    } else {
+                                        mDB.addNote(noteId, name, description, createdBy, created_at
+                                                , last_updated, house_id);
+                                    }
+                                    NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
+                                    frag.updateCursor();
+                                }
+                            }
                         } else {
                             mDB.deleteHouse();
                             Intent intent = new Intent(HomeActivity.this, NoHouseActivity.class);
@@ -266,7 +288,6 @@ public class HomeActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("email", email);
                 params.put("api_key", api_key);
-                params.put("houseID", houseID);
                 params.put("last_updated", last_updated);
 
                 return params;
@@ -279,6 +300,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        //  Code from http://stackoverflow.com/questions/8785221/retrieve-a-fragment-from-a-viewpager
+        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -298,6 +322,14 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+
+        @Override
         public int getCount() {
             // Show 2 total pages.
             return 2;
@@ -312,6 +344,10 @@ public class HomeActivity extends AppCompatActivity {
                     return "EXPENSES";
             }
             return null;
+        }
+
+        public Fragment getRegisteredFragment(int position) {
+            return registeredFragments.get(position);
         }
     }
 

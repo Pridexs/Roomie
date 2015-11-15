@@ -87,7 +87,8 @@ public class JoinHouseActivity extends Activity {
                         JSONObject jHouse   = jObj.getJSONObject("house");
                         int house_id        = jHouse.getInt("house_id");
                         String house_name   = jHouse.getString("house_name");
-                        mDB.addHouse(house_id, house_name);
+                        String last_updated = jHouse.getString("last_updated");
+                        mDB.addHouse(house_id, house_name, last_updated);
 
                         JSONObject jMembers = jObj.getJSONObject("members");
                         Iterator<?> keys = jMembers.keys();

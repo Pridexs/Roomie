@@ -93,8 +93,8 @@ public class RegisterHouseActivity extends Activity {
                         JSONObject jHouse   = jObj.getJSONObject("house");
                         int house_id        = jHouse.getInt("house_id");
                         String house_name   = jHouse.getString("house_name");
-
-                        mDB.addHouse(house_id, house_name);
+                        String last_updated = jHouse.getString("last_updated");
+                        mDB.addHouse(house_id, house_name, last_updated);
                         mDB.addHouseMember(house_id, email, 1);
 
 
@@ -120,7 +120,7 @@ public class RegisterHouseActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HOMEACTIVITY", "Login Error: " + error.getMessage());
+                Log.e("REGISTERHOUSE", "Login Error: " + error.getMessage());
                 Toast.makeText(getApplicationContext(),
                         error.getMessage(), Toast.LENGTH_LONG).show();
             }

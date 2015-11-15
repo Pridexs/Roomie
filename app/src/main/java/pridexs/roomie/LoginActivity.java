@@ -298,8 +298,9 @@ public class LoginActivity extends Activity {
                         if (valid_house) {
                             int house_id            = jObj.getInt("house_id");
                             String house_name       = jObj.getString("house_name");
+                            String h_last_updated   = jObj.getString("last_updated");
 
-                            mDB.addHouse(house_id, house_name);
+                            mDB.addHouse(house_id, house_name, h_last_updated);
 
                             JSONArray jMembers = jObj.getJSONArray("members");
                             for (int i = 0; i < jMembers.length(); i++) {
@@ -322,9 +323,9 @@ public class LoginActivity extends Activity {
                                     int noteId          = jNote.getInt("noteID");
                                     String createdBy    = jNote.getString("createdBy");
                                     String created_at   = jNote.getString("created_at");
-                                    String last_updated = jNote.getString("last_updated");
+                                    String n_last_updated = jNote.getString("last_updated");
                                     mDB.addNote(noteId, name, description, createdBy, created_at
-                                            , last_updated, house_id);
+                                            , n_last_updated, house_id);
                                 }
                             }
 
