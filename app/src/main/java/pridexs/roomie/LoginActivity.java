@@ -69,7 +69,12 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    if (AppController.getInstance().isNetworkAvailable())
+                    {
+                        attemptLogin();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                    }
                     return true;
                 }
                 return false;
@@ -81,7 +86,11 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                if (AppController.getInstance().isNetworkAvailable()) {
+                    attemptLogin();
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

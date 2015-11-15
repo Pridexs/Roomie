@@ -170,133 +170,137 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateHouse() {
-        HashMap<String, String> user = new HashMap<>();
-        HashMap<String, String> house = new HashMap<>();
-        try {
-            mDB.open();
-            user = mDB.getUserDetails();
-            house = mDB.getHouseDetails();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        if (AppController.getInstance().isNetworkAvailable()) {
+            HashMap<String, String> user = new HashMap<>();
+            HashMap<String, String> house = new HashMap<>();
+            try {
+                mDB.open();
+                user = mDB.getUserDetails();
+                house = mDB.getHouseDetails();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
-        final String email = user.get("email");
-        final String api_key = user.get("api_key");
-        final String last_updated = user.get("last_updated");
+            final String email = user.get("email");
+            final String api_key = user.get("api_key");
+            final String last_updated = user.get("last_updated");
 
 
-        // Tag used to cancel the request
-        String tag_string_req = "req_home_activity";
+            // Tag used to cancel the request
+            String tag_string_req = "req_home_activity";
 
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                AppConfig.URL_GET_HOUSE_INFO, new Response.Listener<String>() {
+            StringRequest strReq = new StringRequest(Request.Method.POST,
+                    AppConfig.URL_GET_HOUSE_INFO, new Response.Listener<String>() {
 
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jObj = new JSONObject(response);
-                    boolean error = jObj.getBoolean("error");
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jObj = new JSONObject(response);
+                        boolean error = jObj.getBoolean("error");
 
-                    // Check for error node in json
-                    if (!error) {
+                        // Check for error node in json
+                        if (!error) {
 
-                        boolean valid_house = jObj.getBoolean("valid_house");
+                            boolean valid_house = jObj.getBoolean("valid_house");
 
-                        mDB.open();
+                            mDB.open();
 
-                        if (valid_house) {
-                            int house_id            = jObj.getInt("house_id");
-                            String house_name       = jObj.getString("house_name");
-                            String h_last_updated   = jObj.getString("last_updated");
-                            boolean requires_sync   = jObj.getBoolean("requires_sync");
+                            if (valid_house) {
+                                int house_id            = jObj.getInt("house_id");
+                                String house_name       = jObj.getString("house_name");
+                                String h_last_updated   = jObj.getString("last_updated");
+                                boolean requires_sync   = jObj.getBoolean("requires_sync");
 
-                            if (requires_sync) {
+                                if (requires_sync) {
 
-                                mDB.updateHouse(house_id, house_name, h_last_updated);
-                                JSONArray jMembers = jObj.getJSONArray("members");
-                                for (int i = 0; i < jMembers.length(); i++) {
-                                    JSONObject jMem     = jMembers.getJSONObject(i);
-                                    String memberEmail  = jMem.getString("email");
-                                    String memberName   = jMem.getString("name");
-                                    int isAdmin         = jMem.getInt("isAdmin");
-                                    if (mDB.isUserOnDb(memberEmail))
-                                    {
-                                        mDB.updateUser(memberEmail, memberName, isAdmin);
-                                    } else {
-                                        mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                                        if (!memberEmail.equals(email)) {
-                                            mDB.addUser(memberName, memberEmail);
+                                    mDB.updateHouse(house_id, house_name, h_last_updated);
+                                    JSONArray jMembers = jObj.getJSONArray("members");
+                                    for (int i = 0; i < jMembers.length(); i++) {
+                                        JSONObject jMem     = jMembers.getJSONObject(i);
+                                        String memberEmail  = jMem.getString("email");
+                                        String memberName   = jMem.getString("name");
+                                        int isAdmin         = jMem.getInt("isAdmin");
+                                        if (mDB.isUserOnDb(memberEmail))
+                                        {
+                                            mDB.updateUser(memberEmail, memberName, isAdmin);
+                                        } else {
+                                            mDB.addHouseMember(house_id, memberEmail, isAdmin);
+                                            if (!memberEmail.equals(email)) {
+                                                mDB.addUser(memberName, memberEmail);
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            if (jObj.has("notes")) {
-                                JSONArray jNotes = jObj.getJSONArray("notes");
-                                for (int i = 0; i < jNotes.length(); i++) {
-                                    JSONObject jNote    = jNotes.getJSONObject(i);
-                                    int noteId          = jNote.getInt("noteID");
-                                    String name         = jNote.getString("name");
-                                    String description  = jNote.getString("description");
-                                    String createdBy    = jNote.getString("createdBy");
-                                    String created_at   = jNote.getString("created_at");
-                                    String last_updated = jNote.getString("last_updated");
-                                    if (mDB.isNoteOnDb(noteId)) {
-                                        mDB.updateNote(noteId, name, description, last_updated);
-                                    } else {
-                                        mDB.addNote(noteId, name, description, createdBy, created_at
-                                                , last_updated, house_id);
+                                if (jObj.has("notes")) {
+                                    JSONArray jNotes = jObj.getJSONArray("notes");
+                                    for (int i = 0; i < jNotes.length(); i++) {
+                                        JSONObject jNote    = jNotes.getJSONObject(i);
+                                        int noteId          = jNote.getInt("noteID");
+                                        String name         = jNote.getString("name");
+                                        String description  = jNote.getString("description");
+                                        String createdBy    = jNote.getString("createdBy");
+                                        String created_at   = jNote.getString("created_at");
+                                        String last_updated = jNote.getString("last_updated");
+                                        if (mDB.isNoteOnDb(noteId)) {
+                                            mDB.updateNote(noteId, name, description, last_updated);
+                                        } else {
+                                            mDB.addNote(noteId, name, description, createdBy, created_at
+                                                    , last_updated, house_id);
+                                        }
+                                        NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
+                                        frag.updateCursor();
                                     }
-                                    NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
-                                    frag.updateCursor();
                                 }
+                            } else {
+                                mDB.deleteHouse();
+                                Intent intent = new Intent(HomeActivity.this, NoHouseActivity.class);
+                                startActivity(intent);
+                                finish();
                             }
                         } else {
-                            mDB.deleteHouse();
-                            Intent intent = new Intent(HomeActivity.this, NoHouseActivity.class);
-                            startActivity(intent);
-                            finish();
+                            String errorMsg = jObj.getString("error_msg");
+                            Toast.makeText(getApplicationContext(),
+                                    errorMsg, Toast.LENGTH_LONG).show();
+                            logoutUser();
                         }
-                    } else {
-                        String errorMsg = jObj.getString("error_msg");
-                        Toast.makeText(getApplicationContext(),
-                                errorMsg, Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        // JSON error
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        logoutUser();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                         logoutUser();
                     }
-                } catch (JSONException e) {
-                    // JSON error
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    logoutUser();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    logoutUser();
+
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }) {
+
+                @Override
+                protected Map<String, String> getParams() {
+                    // Posting parameters to login url
+                    Map<String, String> params = new HashMap<>();
+                    params.put("email", email);
+                    params.put("api_key", api_key);
+                    params.put("last_updated", last_updated);
+
+                    return params;
                 }
 
-            }
-        }, new Response.ErrorListener() {
+            };
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Json error: " + error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }) {
-
-            @Override
-            protected Map<String, String> getParams() {
-                // Posting parameters to login url
-                Map<String, String> params = new HashMap<>();
-                params.put("email", email);
-                params.put("api_key", api_key);
-                params.put("last_updated", last_updated);
-
-                return params;
-            }
-
-        };
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+            // Adding request to request queue
+            AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+        } else {
+            Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
