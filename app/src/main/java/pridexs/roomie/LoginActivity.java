@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,12 +69,8 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    if (AppController.getInstance().isNetworkAvailable()) {
-                        attemptLogin();
-                        return true;
-                    } else {
-                        Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
-                    }
+                    attemptLogin();
+                    return true;
                 }
                 return false;
             }
@@ -297,6 +294,7 @@ public class LoginActivity extends Activity {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
 
+                    // Check for error node in json
                     if (!error) {
 
                         boolean valid_house = jObj.getBoolean("valid_house");
@@ -306,29 +304,26 @@ public class LoginActivity extends Activity {
                         if (valid_house) {
                             int house_id            = jObj.getInt("house_id");
                             String house_name       = jObj.getString("house_name");
+                            boolean requires_sync   = jObj.getBoolean("requires_sync");
 
                             mDB.deleteHouse();
+
                             mDB.addHouse(house_id, house_name);
 
-                            JSONObject jMembers = jObj.getJSONObject("members");
-                            Iterator<?> keys = jMembers.keys();
-                            while (keys.hasNext()) {
-                                String key = (String)keys.next();
-                                if ( jMembers.get(key) instanceof JSONObject ) {
-                                    JSONObject jMem = jMembers.getJSONObject(key);
-                                    String memberEmail  = jMem.getString("email");
-                                    String memberName   = jMem.getString("name");
-                                    int isAdmin         = jMem.getInt("isAdmin");
-                                    mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                                    if (!memberEmail.equals(email)) {
-                                        mDB.addUser(memberName, memberEmail);
-                                    }
+                            JSONArray jMembers = jObj.getJSONArray("members");
+                            for (int i = 0; i < jMembers.length(); i++) {
+                                JSONObject jMem     = jMembers.getJSONObject(i);
+                                String memberEmail  = jMem.getString("email");
+                                String memberName   = jMem.getString("name");
+                                int isAdmin         = jMem.getInt("isAdmin");
+                                mDB.addHouseMember(house_id, memberEmail, isAdmin);
+                                if (!memberEmail.equals(email)) {
+                                    mDB.addUser(memberName, memberEmail);
                                 }
                             }
                             Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(i);
                             finish();
-
                         } else {
                             mDB.deleteHouse();
                             Intent intent = new Intent(LoginActivity.this, NoHouseActivity.class);

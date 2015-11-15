@@ -42,6 +42,11 @@ public class DBManager {
     private static final String TABLE_HOUSE_MEMBER = "house_member";
     private static final String KEY_IS_ADMIN = "isAdmin";
 
+    //NOTE
+    private static final String TABLE_NOTE = "note";
+    private static final String KEY_CREATED_BY = "createdBy";
+    private static final String KEY_DESCRIPTION = "description";
+
     /*
      * Code from http://www.androiddesignpatterns.com/2012/05/correctly-managing-your-sqlite-database.html
      */
@@ -99,6 +104,22 @@ public class DBManager {
                         "UNIQUE (" + KEY_EMAIL + "," + KEY_HOUSEID + ")" +
                         ")";
 
+        private static final String SQL_CREATE_NOTE =
+                "CREATE TABLE " + TABLE_NOTE + "(" +
+                        KEY_ID + " INTEGER NOT NULL," +
+                        KEY_CREATED_BY + " TEXT NOT NULL," +
+                        KEY_HOUSEID + " INTEGER NOT NULL," +
+                        KEY_NAME + " TEXT NOT NULL," +
+                        KEY_DESCRIPTION + " TEXT," +
+                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
+                        KEY_CREATED_AT + " TEXT NOT NULL," +
+                        "FOREIGN KEY (" + KEY_HOUSEID + ") REFERENCES " + TABLE_HOUSE + "(" +
+                        KEY_HOUSEID + ")," +
+                        "FOREIGN KEY (" + KEY_CREATED_BY + ") REFERENCES " + TABLE_USER + "(" +
+                        KEY_EMAIL + ")," +
+                        "UNIQUE (" + KEY_HOUSEID + ")" +
+                        ")";
+
         public MyDatabaseHelper(Context context)
         {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -109,11 +130,13 @@ public class DBManager {
             db.execSQL(SQL_CREATE_USER);
             db.execSQL(SQL_CREATE_HOUSE);
             db.execSQL(SQL_CREATE_HOUSE_MEMBER);
+            db.execSQL(SQL_CREATE_NOTE);
         }
 
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
         {
             // DROP ALL TABLES
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HOUSE_MEMBER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HOUSE);
@@ -195,6 +218,7 @@ public class DBManager {
 
     public void deleteHouse() {
         // DELETE ALL HOUSE INFO SINCE IT NEEDS SYNC
+        db.delete(TABLE_NOTE, null , null);
         db.delete(TABLE_HOUSE_MEMBER, null, null);
         db.delete(TABLE_HOUSE, null, null);
     }
@@ -237,6 +261,7 @@ public class DBManager {
         String selectQuery = "SELECT hm." + KEY_ID + ", u." + KEY_EMAIL + ", u." + KEY_NAME + ", hm." + KEY_IS_ADMIN +
                 " FROM " + TABLE_HOUSE_MEMBER + " as hm INNER JOIN " +
                 TABLE_USER + " as u ON hm." + KEY_EMAIL + " = " +  " u." + KEY_EMAIL;
+
         return db.rawQuery(selectQuery, null);
     }
 
