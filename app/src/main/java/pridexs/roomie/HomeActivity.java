@@ -256,7 +256,7 @@ public class HomeActivity extends AppCompatActivity {
                                                 mDB.updateNote(noteId, name, description, last_updated);
                                                 updatedNotes++;
                                             }
-                                        } else {
+                                        } else if (wasDeleted == 0) {
                                             mDB.addNote(noteId, name, description, createdBy, created_at
                                                     , last_updated, house_id);
                                             newNotes++;

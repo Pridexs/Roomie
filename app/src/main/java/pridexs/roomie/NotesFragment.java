@@ -14,8 +14,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class NotesFragment extends android.support.v4.app.Fragment
@@ -146,6 +156,90 @@ public class NotesFragment extends android.support.v4.app.Fragment
         Toast.makeText(getActivity().getApplicationContext(),
                 "Clicked Delete",
                 Toast.LENGTH_LONG).show();
+        int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
+        if (AppController.getInstance().isNetworkAvailable()) {
+            deleteNote(noteId);
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    public void deleteNote(final int noteId) {
+        HashMap<String, String> user = new HashMap<>();
+        try {
+            mDB.open();
+            user = mDB.getUserDetails();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        final String email = user.get("email");
+        final String api_key = user.get("api_key");
+
+        // Tag used to cancel the request
+        String tag_string_req = "req_home_activity";
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                AppConfig.URL_DELETE_NOTE, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    boolean error = jObj.getBoolean("error");
+
+                    // Check for error node in json
+                    if (!error) {
+                        boolean valid_house = jObj.getBoolean("valid_house");
+                        mDB.open();
+                        if (valid_house) {
+                            // It is safe to delete the note
+                            mDB.deleteNote(noteId);
+                            updateCursor();
+                            Toast.makeText(getActivity().getApplicationContext(), "Note deleted.", Toast.LENGTH_LONG).show();
+                        } else {
+                            mDB.deleteHouse();
+                            Intent intent = new Intent(getActivity(), NoHouseActivity.class);
+                            startActivity(intent);
+                            getActivity().finish();
+                        }
+                    } else {
+                        String errorMsg = jObj.getString("error_msg");
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity().getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to login url
+                Map<String, String> params = new HashMap<>();
+                params.put("email", email);
+                params.put("api_key", api_key);
+                params.put("note_id", Integer.toString(noteId));
+
+                return params;
+            }
+
+        };
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
     public interface OnFragmentInteractionListener {
