@@ -46,6 +46,7 @@ public class DBManager {
     private static final String TABLE_NOTE = "note";
     private static final String KEY_CREATED_BY = "createdBy";
     private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_WAS_DELETED = "wasDeleted";
 
     /*
      * Code from http://www.androiddesignpatterns.com/2012/05/correctly-managing-your-sqlite-database.html
@@ -114,6 +115,7 @@ public class DBManager {
                         KEY_DESCRIPTION + " TEXT," +
                         KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
                         KEY_CREATED_AT + " TEXT NOT NULL," +
+                        KEY_WAS_DELETED + " INT DEFAULT 0," +
                         "FOREIGN KEY (" + KEY_HOUSEID + ") REFERENCES " + TABLE_HOUSE + "(" +
                         KEY_HOUSEID + ")," +
                         "FOREIGN KEY (" + KEY_CREATED_BY + ") REFERENCES " + TABLE_USER + "(" +
@@ -348,6 +350,12 @@ public class DBManager {
                 TABLE_USER + " as u ON n." + KEY_CREATED_BY + " = " +  " u." + KEY_EMAIL +
                 " ORDER BY " + KEY_LAST_UPDATED + " DESC";
         return db.rawQuery(selectQuery, null);
+    }
+
+    public int deleteNote(int noteId) {
+        String whereClause = KEY_ID + "=?";
+        String[] args = {Integer.toString(noteId)};
+        return db.delete(TABLE_NOTE, whereClause, args);
     }
 
 }

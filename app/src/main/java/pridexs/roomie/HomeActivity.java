@@ -80,8 +80,8 @@ public class HomeActivity extends AppCompatActivity {
                         mFab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Snackbar.make(view, "0", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
+                                Intent i = new Intent(HomeActivity.this, NewNoteActivity.class);
+                                startActivity(i);
                             }
                         });
                         break;
@@ -89,7 +89,7 @@ public class HomeActivity extends AppCompatActivity {
                         mFab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Snackbar.make(view, "1", Snackbar.LENGTH_LONG)
+                                Snackbar.make(view, "Section not yet implemented", Snackbar.LENGTH_LONG)
                                         .setAction("Action", null).show();
                             }
                         });
@@ -109,8 +109,8 @@ public class HomeActivity extends AppCompatActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action ", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(HomeActivity.this, NewNoteActivity.class);
+                startActivity(i);
             }
         });
 
@@ -201,6 +201,11 @@ public class HomeActivity extends AppCompatActivity {
                         // Check for error node in json
                         if (!error) {
 
+                            // Counters
+                            int newNotes = 0;
+                            int updatedNotes = 0;
+                            int deletedNotes = 0;
+
                             boolean valid_house = jObj.getBoolean("valid_house");
 
                             mDB.open();
@@ -237,17 +242,28 @@ public class HomeActivity extends AppCompatActivity {
                                     for (int i = 0; i < jNotes.length(); i++) {
                                         JSONObject jNote    = jNotes.getJSONObject(i);
                                         int noteId          = jNote.getInt("noteID");
+                                        int wasDeleted      = jNote.getInt("was_deleted");
                                         String name         = jNote.getString("name");
                                         String description  = jNote.getString("description");
                                         String createdBy    = jNote.getString("createdBy");
                                         String created_at   = jNote.getString("created_at");
                                         String last_updated = jNote.getString("last_updated");
                                         if (mDB.isNoteOnDb(noteId)) {
-                                            mDB.updateNote(noteId, name, description, last_updated);
+                                            if (wasDeleted == 1) {
+                                                mDB.deleteNote(noteId);
+                                                deletedNotes++;
+                                            } else {
+                                                mDB.updateNote(noteId, name, description, last_updated);
+                                                updatedNotes++;
+                                            }
                                         } else {
                                             mDB.addNote(noteId, name, description, createdBy, created_at
                                                     , last_updated, house_id);
+                                            newNotes++;
                                         }
+                                        Toast.makeText(getApplicationContext(),
+                                                newNotes + " new, " + updatedNotes + " updated, " + deletedNotes + " deleted.",
+                                                Toast.LENGTH_LONG).show();
                                         NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
                                         frag.updateCursor();
                                     }
@@ -307,7 +323,6 @@ public class HomeActivity extends AppCompatActivity {
         //  Code from http://stackoverflow.com/questions/8785221/retrieve-a-fragment-from-a-viewpager
         SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -332,7 +347,6 @@ public class HomeActivity extends AppCompatActivity {
             return fragment;
         }
 
-
         @Override
         public int getCount() {
             // Show 2 total pages.
@@ -354,7 +368,6 @@ public class HomeActivity extends AppCompatActivity {
             return registeredFragments.get(position);
         }
     }
-
 
     public static class PlaceholderFragment extends Fragment {
 
