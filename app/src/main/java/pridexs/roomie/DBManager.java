@@ -234,7 +234,7 @@ public class DBManager {
 
     public void updateLastUpdated() {
         db.execSQL("UPDATE " + TABLE_USER + " SET " + KEY_LAST_UPDATED + " =DATETIME(\'now\') WHERE " +
-                    KEY_API_KEY + " IS NOT null");
+                KEY_API_KEY + " IS NOT null");
     }
     /*
      * END - LOGIN / REGISTER
@@ -332,6 +332,13 @@ public class DBManager {
     public boolean isUserOnDb(String email) {
         String[] values = new String[] { email };
         Cursor c = db.query(TABLE_USER, null, KEY_EMAIL + "= ?", values, null, null, null);
+        return c.moveToFirst();
+    }
+
+    public boolean isUserAdmin(String email) {
+        String[] values = new String[] { email, Integer.toString(1) };
+        String whereStatement =  KEY_EMAIL + "=? AND " + KEY_IS_ADMIN + "=?";
+        Cursor c = db.query(TABLE_HOUSE_MEMBER, null, whereStatement, values, null, null, null);
         return c.moveToFirst();
     }
 

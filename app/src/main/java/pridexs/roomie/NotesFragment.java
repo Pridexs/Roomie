@@ -152,23 +152,54 @@ public class NotesFragment extends android.support.v4.app.Fragment
 
     @Override
     public void onDialogEditClick(DialogFragment dialog) {
-        int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
-        String description = mSelectedNote.get("description");
-        Intent intent = new Intent(getActivity(), EditNoteActivity.class);
-        Bundle extras = new Bundle();
-        extras.putInt("noteId", noteId);
-        extras.putString("description", description);
-        intent.putExtras(extras);
-        startActivity(intent);
+        HashMap<String, String> user = new HashMap<>();
+        try {
+            mDB.open();
+            user = mDB.getUserDetails();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        final String email = user.get("email");
+
+        if (mDB.isUserAdmin(email)) {
+            int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
+            String description = mSelectedNote.get("description");
+            Intent intent = new Intent(getActivity(), EditNoteActivity.class);
+            Bundle extras = new Bundle();
+            extras.putInt("noteId", noteId);
+            extras.putString("description", description);
+            intent.putExtras(extras);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), "You are not an admin!", Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     @Override
     public void onDialogDeleteClick(DialogFragment dialog) {
-        int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
-        if (AppController.getInstance().isNetworkAvailable()) {
-            deleteNote(noteId);
+        HashMap<String, String> user = new HashMap<>();
+        try {
+            mDB.open();
+            user = mDB.getUserDetails();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        final String email = user.get("email");
+
+        if (mDB.isUserAdmin(email)) {
+
+            int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
+            if (AppController.getInstance().isNetworkAvailable()) {
+                deleteNote(noteId);
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+            }
         } else {
-            Toast.makeText(getActivity().getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity().getApplicationContext(), "You are not an admin!", Toast.LENGTH_LONG).show();
         }
 
     }
