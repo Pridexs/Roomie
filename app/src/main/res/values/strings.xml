@@ -64,5 +64,7 @@
     <string name="title_activity_display_note">DisplayNoteActivity</string>
     <string name="created_by">Created by</string>
     <string name="last_updated">Last Updated</string>
+    <string name="title_activity_edit_note">EditNoteActivity</string>
+    <string name="edit_note">Edit Note</string>
 
 </resources>

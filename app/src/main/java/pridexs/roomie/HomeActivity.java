@@ -263,14 +263,15 @@ public class HomeActivity extends AppCompatActivity {
                                                     , last_updated, house_id);
                                             newNotes++;
                                         }
-                                        Toast.makeText(getApplicationContext(),
-                                                newNotes + " new, " + updatedNotes + " updated, " + deletedNotes + " deleted.",
-                                                Toast.LENGTH_SHORT).show();
+
                                         NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
                                         frag.updateCursor();
                                     }
                                     mDB.updateLastUpdated();
                                 }
+                                Toast.makeText(getApplicationContext(),
+                                        newNotes + " new, " + updatedNotes + " updated, " + deletedNotes + " deleted.",
+                                        Toast.LENGTH_SHORT).show();
                             } else {
                                 mDB.deleteHouse();
                                 Intent intent = new Intent(HomeActivity.this, NoHouseActivity.class);

@@ -152,6 +152,14 @@ public class NotesFragment extends android.support.v4.app.Fragment
 
     @Override
     public void onDialogEditClick(DialogFragment dialog) {
+        int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
+        String description = mSelectedNote.get("description");
+        Intent intent = new Intent(getActivity(), EditNoteActivity.class);
+        Bundle extras = new Bundle();
+        extras.putInt("noteId", noteId);
+        extras.putString("description", description);
+        intent.putExtras(extras);
+        startActivity(intent);
     }
 
     @Override
