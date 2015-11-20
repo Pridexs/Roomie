@@ -134,6 +134,12 @@ public class NotesFragment extends android.support.v4.app.Fragment
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateCursor();
+    }
+
     public void updateCursor() {
         try {
             mDB.open();
@@ -146,16 +152,10 @@ public class NotesFragment extends android.support.v4.app.Fragment
 
     @Override
     public void onDialogEditClick(DialogFragment dialog) {
-        Toast.makeText(getActivity().getApplicationContext(),
-                "Clicked Edit",
-                Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDialogDeleteClick(DialogFragment dialog) {
-        Toast.makeText(getActivity().getApplicationContext(),
-                "Clicked Delete",
-                Toast.LENGTH_LONG).show();
         int noteId = Integer.parseInt(mSelectedNote.get("noteId"));
         if (AppController.getInstance().isNetworkAvailable()) {
             deleteNote(noteId);
@@ -197,7 +197,7 @@ public class NotesFragment extends android.support.v4.app.Fragment
                             // It is safe to delete the note
                             mDB.deleteNote(noteId);
                             updateCursor();
-                            Toast.makeText(getActivity().getApplicationContext(), "Note deleted.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity().getApplicationContext(), "Note deleted.", Toast.LENGTH_SHORT).show();
                         } else {
                             mDB.deleteHouse();
                             Intent intent = new Intent(getActivity(), NoHouseActivity.class);
@@ -215,7 +215,6 @@ public class NotesFragment extends android.support.v4.app.Fragment
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
             }
         }, new Response.ErrorListener() {
 

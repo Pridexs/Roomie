@@ -117,7 +117,6 @@ public class HomeActivity extends AppCompatActivity {
         updateHouse();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -157,6 +156,8 @@ public class HomeActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void logoutUser() {
         mSession.setLogin(false, "none");
@@ -227,7 +228,8 @@ public class HomeActivity extends AppCompatActivity {
                                         int isAdmin         = jMem.getInt("isAdmin");
                                         if (mDB.isUserOnDb(memberEmail))
                                         {
-                                            mDB.updateUser(memberEmail, memberName, isAdmin);
+                                            mDB.updateHouseMember(memberEmail, isAdmin);
+                                            mDB.updateUser(memberEmail, memberName);
                                         } else {
                                             mDB.addHouseMember(house_id, memberEmail, isAdmin);
                                             if (!memberEmail.equals(email)) {
@@ -256,17 +258,18 @@ public class HomeActivity extends AppCompatActivity {
                                                 mDB.updateNote(noteId, name, description, last_updated);
                                                 updatedNotes++;
                                             }
-                                        } else if (wasDeleted == 0) {
+                                        } else {
                                             mDB.addNote(noteId, name, description, createdBy, created_at
                                                     , last_updated, house_id);
                                             newNotes++;
                                         }
                                         Toast.makeText(getApplicationContext(),
                                                 newNotes + " new, " + updatedNotes + " updated, " + deletedNotes + " deleted.",
-                                                Toast.LENGTH_LONG).show();
+                                                Toast.LENGTH_SHORT).show();
                                         NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
                                         frag.updateCursor();
                                     }
+                                    mDB.updateLastUpdated();
                                 }
                             } else {
                                 mDB.deleteHouse();

@@ -218,12 +218,23 @@ public class DBManager {
         db.delete(TABLE_USER, null, null);
     }
 
-    public long updateUser(String email, String name, int isAdmin) {
+    public long updateHouseMember(String email, int isAdmin) {
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, email);
         values.put(KEY_IS_ADMIN, isAdmin);
 
         return db.update(TABLE_HOUSE_MEMBER, values, KEY_EMAIL + "=?", new String[]{email});
+    }
+
+    public long updateUser(String email, String name) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME , name);
+
+        return db.update(TABLE_USER, values, KEY_EMAIL + "=?", new String[]{email});
+    }
+
+    public void updateLastUpdated() {
+        db.execSQL("UPDATE " + TABLE_USER + " SET " + KEY_LAST_UPDATED + " =DATETIME(\'now\') WHERE " +
+                    KEY_API_KEY + " IS NOT null");
     }
     /*
      * END - LOGIN / REGISTER
@@ -344,6 +355,7 @@ public class DBManager {
 
         return db.insert(TABLE_NOTE, null, values);
     }
+
     public Cursor getCursorNotes() {
         String selectQuery = "SELECT u." + KEY_NAME + " as memberName, n.*" +
                 " FROM " + TABLE_NOTE + " as n INNER JOIN " +

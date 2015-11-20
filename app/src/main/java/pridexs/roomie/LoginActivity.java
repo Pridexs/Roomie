@@ -69,8 +69,7 @@ public class LoginActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    if (AppController.getInstance().isNetworkAvailable())
-                    {
+                    if (AppController.getInstance().isNetworkAvailable()) {
                         attemptLogin();
                     } else {
                         Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
