@@ -107,7 +107,6 @@ public class LoginActivity extends Activity {
     }
 
 
-
     public void attemptLogin() {
 
         // Reset errors.

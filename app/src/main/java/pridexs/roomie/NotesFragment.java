@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,55 +71,46 @@ public class NotesFragment extends android.support.v4.app.Fragment
         }
 
         Cursor notesCursor = mDB.getCursorNotes();
-        if (notesCursor.moveToFirst())
-        {
-            mAdapter = new NotesAdapter(getActivity(), notesCursor, 0);
-            mNotes.setAdapter(mAdapter);
+        mAdapter = new NotesAdapter(getActivity(), notesCursor, 0);
+        mNotes.setAdapter(mAdapter);
 
-            mNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Cursor cursor = (Cursor) mNotes.getItemAtPosition(position);
-                    String createdBy = cursor.getString(cursor.getColumnIndexOrThrow("memberName"));
-                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-                    String lastUpdated = cursor.getString(cursor.getColumnIndexOrThrow("last_updated"));
-                    Intent i = new Intent(getActivity(), DisplayNoteActivity.class);
-                    Bundle b = new Bundle();
-                    b.putString("memberName", createdBy);
-                    b.putString("description", description);
-                    b.putString("last_updated", lastUpdated);
-                    i.putExtras(b);
-                    startActivity(i);
-                }
-            });
+        mNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) mNotes.getItemAtPosition(position);
+                String createdBy = cursor.getString(cursor.getColumnIndexOrThrow("memberName"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                String lastUpdated = cursor.getString(cursor.getColumnIndexOrThrow("last_updated"));
+                Intent i = new Intent(getActivity(), DisplayNoteActivity.class);
+                Bundle b = new Bundle();
+                b.putString("memberName", createdBy);
+                b.putString("description", description);
+                b.putString("last_updated", lastUpdated);
+                i.putExtras(b);
+                startActivity(i);
+            }
+        });
 
-            mNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    Cursor cursor = (Cursor) mNotes.getItemAtPosition(position);
-                    int noteId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-                    String createdBy = cursor.getString(cursor.getColumnIndexOrThrow("memberName"));
-                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-                    String lastUpdated = cursor.getString(cursor.getColumnIndexOrThrow("last_updated"));
-                    DialogFragment dialog = new NoteDialogFragment();
-                    mSelectedNote.clear();
-                    mSelectedNote.put("noteId", Integer.toString(noteId));
-                    mSelectedNote.put("description", description);
-                    mSelectedNote.put("memberName", createdBy);
-                    mSelectedNote.put("last_updated", lastUpdated);
-                    dialog.setTargetFragment(NotesFragment.this, 0);
-                    dialog.show(getActivity().getSupportFragmentManager(), "note_options");
+        mNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) mNotes.getItemAtPosition(position);
+                int noteId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                String createdBy = cursor.getString(cursor.getColumnIndexOrThrow("memberName"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                String lastUpdated = cursor.getString(cursor.getColumnIndexOrThrow("last_updated"));
+                DialogFragment dialog = new NoteDialogFragment();
+                mSelectedNote.clear();
+                mSelectedNote.put("noteId", Integer.toString(noteId));
+                mSelectedNote.put("description", description);
+                mSelectedNote.put("memberName", createdBy);
+                mSelectedNote.put("last_updated", lastUpdated);
+                dialog.setTargetFragment(NotesFragment.this, 0);
+                dialog.show(getActivity().getSupportFragmentManager(), "note_options");
 
-                    return true;
-                }
-            });
-
-
-
-        } else {
-            mNotes.setVisibility(View.GONE);
-            mWarning.setVisibility(View.VISIBLE);
-        }
+                return true;
+            }
+        });
 
         return rootView;
     }
@@ -143,7 +135,16 @@ public class NotesFragment extends android.support.v4.app.Fragment
     public void updateCursor() {
         try {
             mDB.open();
-            mAdapter.changeCursor(mDB.getCursorNotes());
+            Cursor c = mDB.getCursorNotes();
+            if (c.moveToFirst()) {
+                mAdapter.changeCursor(c);
+                mNotes.setVisibility(View.VISIBLE);
+                mWarning.setVisibility(View.GONE);
+            } else {
+                mNotes.setVisibility(View.GONE);
+                mWarning.setVisibility(View.VISIBLE);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,12 +1,13 @@
 package pridexs.roomie;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -14,35 +15,35 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-public class JoinHouseActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
 
-    DBManager mDB;
+    private DBManager mDB;
+    private SessionManager mSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_house);
+        setContentView(R.layout.activity_settings);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mDB = DBManager.getInstance(this);
-        Button joinHouseButton = (Button) findViewById(R.id.joinHouseButton);
+        mSession = new SessionManager(this);
 
-        joinHouseButton.setOnClickListener(new View.OnClickListener() {
+        Button leaveHouseButton = (Button) findViewById(R.id.leave_house);
+        leaveHouseButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 if (AppController.getInstance().isNetworkAvailable()) {
-                    EditText idView = (EditText) findViewById(R.id.text_id_join);
-                    EditText passwordView = (EditText) findViewById(R.id.text_password_join);
-                    int houseId = Integer.parseInt(idView.getText().toString());
-                    String housePass = passwordView.getText().toString().trim();
-                    joinHouse(houseId, housePass);
+                    leaveHouse();
                 } else {
                     Toast.makeText(getApplicationContext(), "No Network Connection.", Toast.LENGTH_LONG).show();
                 }
@@ -50,14 +51,7 @@ public class JoinHouseActivity extends Activity {
         });
     }
 
-    @Override
-    public void onBackPressed()  {
-        Intent intent = new Intent(JoinHouseActivity.this, NoHouseActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void joinHouse(final int houseId, final String housePassword) {
+    void leaveHouse() {
         HashMap<String, String> user = new HashMap<>();
         try {
             mDB.open();
@@ -69,10 +63,11 @@ public class JoinHouseActivity extends Activity {
         final String email = user.get("email");
         final String api_key = user.get("api_key");
 
-        String tag_string_req = "req_join_house";
+        // Tag used to cancel the request
+        String tag_string_req = "req_home_activity";
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                AppConfig.URL_JOIN_HOUSE, new Response.Listener<String>() {
+                AppConfig.URL_LEAVE_HOUSE, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -82,28 +77,11 @@ public class JoinHouseActivity extends Activity {
 
                     // Check for error node in json
                     if (!error) {
-
                         mDB.open();
-                        JSONObject jHouse   = jObj.getJSONObject("house");
-                        int house_id        = jHouse.getInt("house_id");
-                        String house_name   = jHouse.getString("house_name");
-                        String last_updated = jHouse.getString("last_updated");
-                        mDB.addHouse(house_id, house_name, last_updated);
 
-                        JSONObject jMembers = jObj.getJSONObject("members");
-                        Iterator<?> keys = jMembers.keys();
-                        while (keys.hasNext()) {
-                            String key = (String)keys.next();
-                            if ( jMembers.get(key) instanceof JSONObject ) {
-                                JSONObject jMem = jMembers.getJSONObject(key);
-                                String memberEmail  = jMem.getString("email");
-                                int isAdmin         = jMem.getInt("isAdmin");
-                                mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                            }
-                        }
-
-                        Toast.makeText(getApplicationContext(), "You've successfully joined a house", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(JoinHouseActivity.this, HomeActivity.class);
+                        logoutUser();
+                        Intent intent = new Intent(SettingsActivity.this, NoHouseActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
 
@@ -113,7 +91,6 @@ public class JoinHouseActivity extends Activity {
                                 errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
-                    // JSON error
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 } catch (SQLException e) {
@@ -125,8 +102,7 @@ public class JoinHouseActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         }) {
 
@@ -136,15 +112,25 @@ public class JoinHouseActivity extends Activity {
                 Map<String, String> params = new HashMap<>();
                 params.put("email", email);
                 params.put("api_key", api_key);
-                params.put("house_id", Integer.toString(houseId));
-                params.put("house_password", housePassword);
 
                 return params;
             }
 
         };
 
+        // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
-}
 
+    private void logoutUser() {
+        mSession.setLogin(false, "none");
+        try {
+            mDB.open();
+            mDB.deleteUsers();
+            mDB.deleteHouse();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+}

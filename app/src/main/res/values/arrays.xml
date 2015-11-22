@@ -5,4 +5,10 @@
         <item>Edit</item>
         <item>Remove</item>
     </string-array>
+
+    <string-array name="member_options">
+        <item>Kick Member</item>
+        <item>Make Admin</item>
+    </string-array>
+
 </resources>

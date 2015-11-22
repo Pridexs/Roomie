@@ -35,6 +35,7 @@
     <string name="action_sign_in">Sign in</string>
     <string name="action_register">Register</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_change_password">Change Password</string>
     <string name="action_sign_in_short">Sign in</string>
 
     <string name="error_invalid_email">This email address is invalid</string>
@@ -56,6 +57,7 @@
     <string name="house_info_change_password">Change House Password</string>
     <string name="house_info_members">Members</string>
     <string name="house_info">House</string>
+    <string name="leave_house">Leave House</string>
 
     <!-- Notes -->
     <string name="no_notes">No Notes :(</string>
@@ -66,5 +68,6 @@
     <string name="last_updated">Last Updated</string>
     <string name="title_activity_edit_note">EditNoteActivity</string>
     <string name="edit_note">Edit Note</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

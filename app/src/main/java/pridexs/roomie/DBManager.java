@@ -79,7 +79,7 @@ public class DBManager {
                         KEY_NAME + " TEXT NOT NULL," +
                         KEY_EMAIL + " TEXT NOT NULL," +
                         KEY_CREATED_AT + " TEXT," +
-                        KEY_LAST_UPDATED + " TEXT DEFAULT CURRENT_DATE," +
+                        KEY_LAST_UPDATED + " TEXT DEFAULT \"0000-00-00 00:00:00\"," +
                         KEY_API_KEY + " TEXT," +
                         "UNIQUE(" + KEY_EMAIL + "," + KEY_ID + ")" +
                         ")";

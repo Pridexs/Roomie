@@ -141,6 +141,8 @@ public class HomeActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch(id) {
             case R.id.action_settings:
+                i = new Intent(HomeActivity.this,SettingsActivity.class);
+                startActivity(i);
                 return true;
             case R.id.action_logout:
                 logoutUser();
