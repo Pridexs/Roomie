@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.content.Intent;
@@ -54,6 +60,7 @@ public class RegisterHouseActivity extends Activity {
      * Overriding the 'back' key since the NoHouseActivity was finished.
      * (If the user sucessfuly registers, he will be brought to the
      * HomeActivity instead)
+     * P.s: This could've been done with a flag in the Intent.
      */
     @Override
     public void onBackPressed()  {

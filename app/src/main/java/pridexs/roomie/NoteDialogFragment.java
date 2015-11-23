@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.app.Activity;
@@ -9,7 +15,7 @@ import android.support.v4.app.DialogFragment;
 
 public class NoteDialogFragment extends DialogFragment {
 
-    // Implementation taken from Android website
+    // Implementation taken from the official Android website
     // http://developer.android.com/guide/topics/ui/dialogs.html
 
     public interface NoteDialogListener {

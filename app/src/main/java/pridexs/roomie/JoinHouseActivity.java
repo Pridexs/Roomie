@@ -1,9 +1,14 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;

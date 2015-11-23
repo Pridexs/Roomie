@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.content.ContentValues;
@@ -5,7 +11,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -14,15 +19,11 @@ import java.util.Vector;
 public class DBManager {
     private static DBManager mInstance;
 
-    private static final String TAG = DBManager.class.getSimpleName();
-
     public static final int DATABASE_VERSION = 1;
 
     private final Context context;
     private MyDatabaseHelper DBHelper;
     private SQLiteDatabase db;
-    // Counts how many Threads have opened the DB so we don't close the instance accidentaly.
-    private int counterDB = 0;
 
     private static final String KEY_ID = "_id";
 
@@ -50,6 +51,7 @@ public class DBManager {
 
     /*
      * Code from http://www.androiddesignpatterns.com/2012/05/correctly-managing-your-sqlite-database.html
+     * Basically, there is only one instance of DBManager so we can control better when the DB is opened/closed
      */
     public static synchronized DBManager getInstance(Context context) {
 
@@ -162,19 +164,6 @@ public class DBManager {
         return this;
     }
 
-    /*
-    public void close()
-    {
-        counterDB--;
-        if (counterDB == 0) {
-            DBHelper.close();
-        }
-    }
-    */
-
-    /*
-     * BEGIN - LOGIN / REGISTER
-     */
     public long addUser(String name, String email, String created_at, String api_key) {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name); // Name
@@ -236,12 +225,8 @@ public class DBManager {
         db.execSQL("UPDATE " + TABLE_USER + " SET " + KEY_LAST_UPDATED + " =DATETIME(\'now\') WHERE " +
                 KEY_API_KEY + " IS NOT null");
     }
-    /*
-     * END - LOGIN / REGISTER
-     */
 
     public void deleteHouse() {
-        // DELETE ALL HOUSE INFO SINCE IT NEEDS SYNC
         db.delete(TABLE_NOTE, null , null);
         db.delete(TABLE_HOUSE_MEMBER, null, null);
         db.delete(TABLE_HOUSE, null, null);
@@ -306,27 +291,6 @@ public class DBManager {
                 TABLE_USER + " as u ON hm." + KEY_EMAIL + " = " +  " u." + KEY_EMAIL;
 
         return db.rawQuery(selectQuery, null);
-    }
-
-    public Vector<HashMap<String, String>> getHouseMembers() {
-        Vector< HashMap< String, String>> houseMembers = new Vector<>();
-        String selectQuery = "SELECT u." + KEY_EMAIL + ", u." + KEY_NAME + ", hm." + KEY_IS_ADMIN +
-                " FROM " + TABLE_HOUSE_MEMBER + " as hm INNER JOIN " +
-                TABLE_USER + " as u ON hm." + KEY_EMAIL + " = " +  " u." + KEY_EMAIL;
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        cursor.moveToFirst();
-        do {
-            HashMap<String, String> house = new HashMap<>();
-            house.put("email", cursor.getString(cursor.getColumnIndexOrThrow("email")));
-            house.put("name", cursor.getString(cursor.getColumnIndexOrThrow(("name"))));
-            house.put("isAdmin", cursor.getString(cursor.getColumnIndexOrThrow("isAdmin")));
-            houseMembers.add(house);
-        } while(cursor.moveToNext());
-        cursor.close();
-
-        return houseMembers;
     }
 
     public boolean isUserOnDb(String email) {

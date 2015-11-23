@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.content.Context;
@@ -7,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class HouseInfoAdapter extends CursorAdapter {
 

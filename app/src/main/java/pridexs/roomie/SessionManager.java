@@ -1,5 +1,10 @@
-package pridexs.roomie;
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
 
+package pridexs.roomie;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,12 +34,9 @@ public class SessionManager {
     }
 
     public void setLogin(boolean isLoggedIn, String email) {
-
         editor.putBoolean(KEY_IS_LOGGEDIN, isLoggedIn);
         editor.putString(KEY_EMAIL, email);
         editor.commit();
-
-        Log.d(TAG, "User login session modified!");
     }
 
     public boolean isLoggedIn(){

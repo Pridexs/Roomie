@@ -1,15 +1,20 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,9 +35,11 @@ import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
+
+/*
+ * A template from Android studio was used to build this Login Screen
+ */
 
 public class LoginActivity extends Activity {
 
@@ -237,10 +244,7 @@ public class LoginActivity extends Activity {
                     e.printStackTrace();
                     showProgress(false);
                 }
-
             }
-
-
         }, new Response.ErrorListener() {
 
             @Override
@@ -270,18 +274,16 @@ public class LoginActivity extends Activity {
 
     public void verifyHouse() {
         HashMap<String, String> user = new HashMap<>();
-        HashMap<String, String> house = new HashMap<>();
         try {
             mDB.open();
             user = mDB.getUserDetails();
-            house = mDB.getHouseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         final String email = user.get("email");
         final String api_key = user.get("api_key");
-        final String last_updated = "0000-00-00 00:00:00";
+        final String last_updated = user.get("last_updated");
 
         // Tag used to cancel the request
         String tag_string_req = "req_home_activity";
@@ -353,7 +355,6 @@ public class LoginActivity extends Activity {
                         showProgress(false);
                     }
                 } catch (JSONException e) {
-                    // JSON error
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     logoutUser();
@@ -390,7 +391,6 @@ public class LoginActivity extends Activity {
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
-
 
     private void logoutUser() {
         mSession.setLogin(false, "none");

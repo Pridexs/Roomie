@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.app.Activity;
@@ -111,7 +117,6 @@ public class RegisterActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("REGISTERSCREEN", "Registration Error: " + error.getMessage());
                 Toast.makeText(getApplicationContext(),
                         error.getMessage(), Toast.LENGTH_LONG).show();
             }

@@ -1,12 +1,14 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -28,7 +30,6 @@ public class NewNoteActivity extends AppCompatActivity {
 
     TextView mNoteDescriptionView;
     DBManager mDB;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,6 @@ public class NewNoteActivity extends AppCompatActivity {
 
                 return params;
             }
-
         };
 
         // Adding request to request queue

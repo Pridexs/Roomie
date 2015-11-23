@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.app.Application;
@@ -9,6 +15,12 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+
+/*
+ * This class was taken from a tutorial on how to do
+ * login/register in android and adapted to my project
+ * Reference: http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/
+ */
 
 public class AppController extends Application {
     public static final String TAG = AppController.class.getSimpleName();

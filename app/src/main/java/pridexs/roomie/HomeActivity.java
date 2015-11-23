@@ -1,3 +1,9 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
 
 import android.content.Intent;
@@ -159,8 +165,6 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
     private void logoutUser() {
         mSession.setLogin(false, "none");
         try {
@@ -175,11 +179,9 @@ public class HomeActivity extends AppCompatActivity {
     private void updateHouse() {
         if (AppController.getInstance().isNetworkAvailable()) {
             HashMap<String, String> user = new HashMap<>();
-            HashMap<String, String> house = new HashMap<>();
             try {
                 mDB.open();
                 user = mDB.getUserDetails();
-                house = mDB.getHouseDetails();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -228,8 +230,7 @@ public class HomeActivity extends AppCompatActivity {
                                         String memberEmail  = jMem.getString("email");
                                         String memberName   = jMem.getString("name");
                                         int isAdmin         = jMem.getInt("isAdmin");
-                                        if (mDB.isUserOnDb(memberEmail))
-                                        {
+                                        if (mDB.isUserOnDb(memberEmail)) {
                                             mDB.updateHouseMember(memberEmail, isAdmin);
                                             mDB.updateUser(memberEmail, memberName);
                                         } else {
@@ -287,7 +288,6 @@ public class HomeActivity extends AppCompatActivity {
                             logoutUser();
                         }
                     } catch (JSONException e) {
-                        // JSON error
                         e.printStackTrace();
                         Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         logoutUser();
@@ -378,7 +378,6 @@ public class HomeActivity extends AppCompatActivity {
     public static class PlaceholderFragment extends Fragment {
 
         private static final String ARG_SECTION_NUMBER = "section_number";
-
 
         public static PlaceholderFragment newInstance() {
             PlaceholderFragment fragment = new PlaceholderFragment();

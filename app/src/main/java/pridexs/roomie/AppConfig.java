@@ -1,4 +1,16 @@
+/*
+ * Alexandre Maros - D14128553
+ * Dublin Institute of Technology
+ * 2015
+ */
+
 package pridexs.roomie;
+
+/*
+ * This class style was taken from a tutorial on how to do
+ * login/register in android.
+ * Reference: http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/
+ */
 
 public class AppConfig {
     public static String URL_LOGIN = "http://pridexs.com/roomie/login/login.php";
