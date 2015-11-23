@@ -26,6 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Activity to edit a specific note.
+ */
 public class EditNoteActivity extends AppCompatActivity {
 
     private int mNoteId;

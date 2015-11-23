@@ -11,6 +11,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
+/*
+ * Manages a session. Checks if the user is logged in or not.
+ */
 public class SessionManager {
     // LogCat tag
     private static String TAG = SessionManager.class.getSimpleName();

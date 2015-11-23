@@ -26,6 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Activity to register a User
+ */
 public class RegisterActivity extends Activity {
 
     private EditText mEmailView;

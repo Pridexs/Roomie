@@ -31,7 +31,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/*
+ * Fragment that handles all the Note tab.
+ */
 public class NotesFragment extends android.support.v4.app.Fragment
                                 implements NoteDialogFragment.NoteDialogListener {
 

@@ -22,6 +22,11 @@ import com.android.volley.toolbox.Volley;
  * Reference: http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/
  */
 
+
+/*
+ * Custom Application Controller. It is used to control HTTP request within Volley
+ * and also has a method to check if the network is available.
+ */
 public class AppController extends Application {
     public static final String TAG = AppController.class.getSimpleName();
 

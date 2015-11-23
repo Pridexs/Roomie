@@ -21,6 +21,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/*
+ * Adaptar for the Notes ListView.
+ */
 public class NotesAdapter extends CursorAdapter {
 
     public NotesAdapter(Context context, Cursor c, int flags) {

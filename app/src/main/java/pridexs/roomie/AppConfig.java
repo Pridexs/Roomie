@@ -12,6 +12,9 @@ package pridexs.roomie;
  * Reference: http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/
  */
 
+/*
+ * Class just to hold the URLs used within the application.
+ */
 public class AppConfig {
     public static String URL_LOGIN = "http://pridexs.com/roomie/login/login.php";
     public static String URL_REGISTER = "http://pridexs.com/roomie/login/register.php";

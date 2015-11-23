@@ -40,8 +40,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * This is the home activity. It uses Fragments to create the 'Tabs' in the Activity.
+ * The code to handle all the tabs was taken from a Layout within Android Studio.
+ */
 public class HomeActivity extends AppCompatActivity {
-
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 

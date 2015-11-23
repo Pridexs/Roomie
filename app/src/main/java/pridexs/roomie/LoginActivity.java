@@ -38,9 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
+ * The Login Screen.
  * A template from Android studio was used to build this Login Screen
  */
-
 public class LoginActivity extends Activity {
 
     // UI references.

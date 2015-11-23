@@ -27,6 +27,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Activity to Register a House
+ */
 public class RegisterHouseActivity extends Activity {
 
     private DBManager mDB;

@@ -16,6 +16,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+/*
+ * Manages the Databases.
+ */
 public class DBManager {
     private static DBManager mInstance;
 

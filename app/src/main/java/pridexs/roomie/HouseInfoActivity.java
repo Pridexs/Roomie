@@ -22,6 +22,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+/*
+ * Shows a more detailed information about a specific house (members, id, etc)
+ */
 public class HouseInfoActivity extends AppCompatActivity  {
 
     private DBManager       mDB;

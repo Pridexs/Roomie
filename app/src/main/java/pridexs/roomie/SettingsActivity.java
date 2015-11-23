@@ -26,6 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Activity for the Settings.
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     private DBManager mDB;

@@ -13,6 +13,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+/*
+ * Creates a dialog asking if the user wants to edit or remove a specific Note.
+ */
 public class NoteDialogFragment extends DialogFragment {
 
     // Implementation taken from the official Android website

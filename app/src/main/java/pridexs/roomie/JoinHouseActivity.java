@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/*
+ * Activity to join a house.
+ */
 public class JoinHouseActivity extends Activity {
 
     DBManager mDB;

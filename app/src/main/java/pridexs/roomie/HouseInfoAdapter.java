@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+/*
+ * Adapter of a ListView to show the members of a house.
+ */
 public class HouseInfoAdapter extends CursorAdapter {
 
     public HouseInfoAdapter(Context context, Cursor c, int flags) {

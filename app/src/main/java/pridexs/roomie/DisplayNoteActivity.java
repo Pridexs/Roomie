@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
+/*
+ * Simple activity just to display notes with more information.
+ */
 public class DisplayNoteActivity extends AppCompatActivity {
 
     @Override

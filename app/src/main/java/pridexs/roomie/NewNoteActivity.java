@@ -26,6 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Activity to create a new note.
+ */
 public class NewNoteActivity extends AppCompatActivity {
 
     TextView mNoteDescriptionView;

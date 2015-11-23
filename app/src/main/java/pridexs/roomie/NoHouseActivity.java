@@ -14,6 +14,9 @@ import android.widget.Button;
 
 import java.sql.SQLException;
 
+/*
+ * This activity shows if the user is not registered in any house.
+ */
 public class NoHouseActivity extends Activity {
 
     private DBManager mDB;

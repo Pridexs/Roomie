@@ -26,6 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+ * Creates a dialog asking for the password and then changes the house password.
+ */
 public class HousePasswordDialog extends android.support.v4.app.DialogFragment {
 
     private DBManager mDB;
