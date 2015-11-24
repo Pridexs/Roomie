@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -318,7 +319,7 @@ public class LoginActivity extends Activity {
                                 String memberName   = jMem.getString("name");
                                 int isAdmin         = jMem.getInt("isAdmin");
                                 mDB.addHouseMember(house_id, memberEmail, isAdmin);
-                                if (!memberEmail.equals(email)) {
+                                if (!mDB.isUserOnDb(memberEmail)) {
                                     mDB.addUser(memberName, memberEmail);
                                 }
                             }
@@ -327,17 +328,29 @@ public class LoginActivity extends Activity {
                                 JSONArray jNotes = jObj.getJSONArray("notes");
                                 for (int i = 0; i < jNotes.length(); i++) {
                                     JSONObject jNote    = jNotes.getJSONObject(i);
+                                    int noteId          = jNote.getInt("noteID");
+                                    int wasDeleted      = jNote.getInt("was_deleted");
                                     String name         = jNote.getString("name");
                                     String description  = jNote.getString("description");
-                                    int noteId          = jNote.getInt("noteID");
                                     String createdBy    = jNote.getString("createdBy");
                                     String created_at   = jNote.getString("created_at");
-                                    String n_last_updated = jNote.getString("last_updated");
-                                    mDB.addNote(noteId, name, description, createdBy, created_at
-                                            , n_last_updated, house_id);
+                                    String last_updated = jNote.getString("last_updated");
+
+                                    if (mDB.isNoteOnDb(noteId)) {
+                                        if (wasDeleted == 1) {
+                                            mDB.deleteNote(noteId);
+                                        } else {
+                                            mDB.updateNote(noteId, name, description, last_updated);
+                                        }
+                                    } else {
+                                        if (wasDeleted == 0) {
+                                            mDB.addNote(noteId, name, description, createdBy, created_at
+                                                    , last_updated, house_id);
+                                        }
+                                    }
                                 }
                             }
-
+                            mDB.updateLastUpdated();
                             Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(i);
                             finish();

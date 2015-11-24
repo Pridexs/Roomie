@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -256,6 +257,7 @@ public class HomeActivity extends AppCompatActivity {
                                         String createdBy    = jNote.getString("createdBy");
                                         String created_at   = jNote.getString("created_at");
                                         String last_updated = jNote.getString("last_updated");
+
                                         if (mDB.isNoteOnDb(noteId)) {
                                             if (wasDeleted == 1) {
                                                 mDB.deleteNote(noteId);
@@ -265,9 +267,11 @@ public class HomeActivity extends AppCompatActivity {
                                                 updatedNotes++;
                                             }
                                         } else {
-                                            mDB.addNote(noteId, name, description, createdBy, created_at
-                                                    , last_updated, house_id);
-                                            newNotes++;
+                                            if (wasDeleted == 0) {
+                                                mDB.addNote(noteId, name, description, createdBy, created_at
+                                                        , last_updated, house_id);
+                                                newNotes++;
+                                            }
                                         }
 
                                         NotesFragment frag = (NotesFragment) mSectionsPagerAdapter.getRegisteredFragment(0);

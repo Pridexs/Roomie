@@ -87,19 +87,7 @@ public class RegisterActivity extends Activity {
                     boolean error = jObj.getBoolean("error");
                     if (!error) {
                         // User successfully stored in MySQL
-                        // Now store the user in sqlite
-
-                        JSONObject user     = jObj.getJSONObject("user");
-                        String name         = user.getString("name");
-                        String email        = user.getString("email");
-                        String created_at   = user.getString("created_at");
-                        String api_key      = user.getString("api_key");
-
-                        // Inserting row in users table
-                        mDB.open();
-                        mDB.addUser(name, email, created_at, api_key);
                         Toast.makeText(getApplicationContext(), "User successfully registered.", Toast.LENGTH_LONG).show();
-
                         finish();
                     } else {
 
@@ -110,8 +98,6 @@ public class RegisterActivity extends Activity {
                                 errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (SQLException e) {
                     e.printStackTrace();
                 }
 

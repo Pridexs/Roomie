@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class DBManager {
                 "CREATE TABLE " + TABLE_USER + "(" +
                         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         KEY_NAME + " TEXT NOT NULL," +
-                        KEY_EMAIL + " TEXT NOT NULL," +
+                        KEY_EMAIL + " TEXT NOT NULL UNIQUE," +
                         KEY_CREATED_AT + " TEXT," +
                         KEY_LAST_UPDATED + " TEXT DEFAULT \"0000-00-00 00:00:00\"," +
                         KEY_API_KEY + " TEXT," +
@@ -299,6 +300,7 @@ public class DBManager {
     public boolean isUserOnDb(String email) {
         String[] values = new String[] { email };
         Cursor c = db.query(TABLE_USER, null, KEY_EMAIL + "= ?", values, null, null, null);
+
         return c.moveToFirst();
     }
 
@@ -315,6 +317,7 @@ public class DBManager {
 
         return c.moveToFirst();
     }
+    
 
     public long addNote(int noteId, String name, String description, String createdBy,
                         String created_at, String last_updated, int houseId) {

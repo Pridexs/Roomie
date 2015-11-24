@@ -107,7 +107,6 @@ public class RegisterHouseActivity extends Activity {
                         mDB.addHouse(house_id, house_name, last_updated);
                         mDB.addHouseMember(house_id, email, 1);
 
-
                         Intent intent = new Intent(RegisterHouseActivity.this, HomeActivity.class);
                         startActivity(intent);
                         finish();
